@@ -1,3 +1,14 @@
+/*
+Name: Mack Bautista
+Email: mbaut981@mtroyal.ca
+Course: COMP2631-001
+Instructor: Bita Sadeghi
+Assignment: 3
+Due Date: Mar. 14, 2024
+
+Source File: MainProgram.java
+*/
+
 package datacompareproject;
 
 public interface CCDatabase {

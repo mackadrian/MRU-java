@@ -6,33 +6,57 @@ Instructor: Bita Sadeghi
 Assignment: 3
 Due Date: Mar. 14, 2024
 
+Source File: MainProgram.java
 */
-
-
 
 package datacompareproject;
 
-import java.util.Scanner;
-
 public class Account {
+	private long creditCard;
+	private String cardHolder;
+	private String address;
+	private double creditLimit;
+	private double balOwing;
 	
-	public static String file;
-	public static Scanner keyboard = new Scanner (System.in);
 	
-	AccountSystem accounts = new AccountSystem();
-	
-	public static void main (String[] args) {
-		
-		Account program = new Account();
-		program.run();
-		
+	public long getCreditCard() {
+		return creditCard;
 	}
 	
-	public void run() {
-		System.out.print("Database name: ");
-		file = keyboard.nextLine();
-		accounts.readAccounts(file);
-		
+	public void setCreditCard(long creditCard) {
+		this.creditCard = creditCard;
+	}
+	
+	public String getCardHolder() {
+		return cardHolder;
+	}
+	
+	public void setCardHolder(String cardHolder) {
+		this.cardHolder = cardHolder;
+	}
+	
+	public String getAddress() {
+		return address;
+	}
+	
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	public double getCreditLimit() {
+		return creditLimit;
+	}
+	
+	public void setCreditLimit(double creditLimit) {
+		this.creditLimit = creditLimit;
+	}
+	
+	public double getBalOwing() {
+		return balOwing;
+	}
+	
+	public void setBalOwing(double balOwing) {
+		this.balOwing = balOwing;
 	}
 	
 }
