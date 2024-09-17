@@ -1,10 +1,17 @@
-package classList;
 
-/**
- * Assignment 1 Student class.
- *
- * @author Mack Bautista
- */
+/*
+Name: Mack Bautista
+Email: mbaut981@mtroyal.ca
+Course: COMP2631-001
+Instructor: Jason Heard
+Assignment: 1
+Due Date: Sept. 22, 2024
+
+Main File: Main.java
+Class Name: Course.java
+*/
+
+package classList;
 
 public class Course {
 	private String courseName;
@@ -13,6 +20,10 @@ public class Course {
 	private int studentGrade;
 	
 	public Course(String courseName, String courseId, String studentId, int studentGrade) {
+		this.courseName = courseName;
+		this.courseId = courseId;
+		this.studentId = studentId;
+		this.studentGrade = studentGrade;
 	}
 	
 	public String getCourseName() {
@@ -48,7 +59,7 @@ public class Course {
 	}
 	
 	public String toString() {
-		return "Course Name:" + courseName +
+		return "\nCourse Name:" + courseName +
 				"\nCourse Number: " + courseId +
 				"\nStudent Id: " + studentId +
 				"\nStudent Grade: " + studentGrade;

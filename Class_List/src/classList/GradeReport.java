@@ -1,21 +1,41 @@
+/*
+Name: Mack Bautista
+Email: mbaut981@mtroyal.ca
+Course: COMP2631-001
+Instructor: Jason Heard
+Assignment: 1
+Due Date: Sept. 22, 2024
+
+Main File: Main.java
+Class Name: GradeReport.java
+*/
+
 package classList;
 
-/**
- * Assignment 1 Student class.
- *
- * @author Mack Bautista
- */
-
 public class GradeReport {
-	private String studentId;
-	private String courseId;
-	private int StudentCt;
+	private int studentCt;
 	private int courseCt;
 	private Student studentArray[];
 	private Course courseArray[];
 	
-	public GradeReport(Student studentArray, Course courseArray, int StudentCt, int courseCt) {
+	public GradeReport(Student studentArray[], Course courseArray[], int studentCt, int courseCt) {
+		this.studentArray = studentArray.clone();
+		this.courseArray = courseArray.clone();
+		this.studentCt = studentCt;
+		this.courseCt = courseCt;
 	}
+	
+	public String getGradesOfCourse() {
+		
+	}
+	
+	public String getGradesOfStudent() {
+	}
+	
+	public String toString() {
+		
+	}
+	
 	
 	
 

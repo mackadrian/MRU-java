@@ -1,3 +1,14 @@
+/*
+Name: Mack Bautista
+Email: mbaut981@mtroyal.ca
+Course: COMP2631-001
+Instructor: Jason Heard
+Assignment: 1
+Due Date: Sept. 22, 2024
+
+Main File: Main.java
+*/
+
 package classList;
 
 import java.io.*;
