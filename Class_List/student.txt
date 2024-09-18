@@ -1,0 +1,8 @@
+Andrew	ablochha@mtroyal.ca	1
+Bryan	bsarlo@mtroyal.ca	2
+Cathy	cmott@mtroyal.ca	3
+Doug	dstar@mtroyal.ca	4
+Evan	elipp@mtroyal.ca	5
+Fred	fodds@mtroyal.ca	6
+George	gbrown@mtroyal.ca	7
+Henry	hsmith@mtroyal.ca	8
