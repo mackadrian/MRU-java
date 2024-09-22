@@ -99,7 +99,7 @@ public class Main {
         System.out.println("Student Id: 1, Grade: 100, Course: 1027");
         System.out.println("Student Id: 2, Grade: 100, Course: 3357");
         System.out.println("Student Id: 3, Grade: 85, Course: 4457");
-        System.out.println("Student Id: 4, Grade: 0, Course: 2210");
+        System.out.println("Student Id: 4, Grade: 66, Course: 2210");
         System.out.println("Student Id: 5, Grade: 55, Course: 3340");
         System.out.println("Student Id: 1, Grade: 78, Course: 3342");
         System.out.println("Student Id: 8, Grade: 44, Course: 4442");
@@ -128,7 +128,7 @@ public class Main {
         System.out.println("\n----------Test 3: Testing the Student toString() ----------");
         System.out.println("Expected Result:");
         System.out.println("Student Name:  Andrew");
-        System.out.println("Student Email: ablochha@uwo.ca");
+        System.out.println("Student Email: ablochha@mtroyal.ca");
         System.out.println("Student Id:    1");
         System.out.println("\nActual Result:");
         System.out.println(student.toString());
@@ -166,7 +166,7 @@ public class Main {
         System.out.println("Updated Course Name: How to Train Your Dragon");
         System.out.println("\nActual Result:");
         System.out.format("Updated Course Name: %s\n", course.getCourseName());
-/*
+
         // Test 8 --- Testing getGradesOfCourse()
         System.out.println("\n----------Test 8: Testing getGradesOfCourse()----------");
         System.out.println("Expected Result:");
@@ -197,7 +197,7 @@ public class Main {
         System.out.println("There are No Grades for Student Id: 7");
         System.out.println("\nActual Result:");
         System.out.format("%s\n", gradeReport.getGradesOfStudent("7"));
-*/
+
     } //end main (Method)
 
 } //end Main (Class)
