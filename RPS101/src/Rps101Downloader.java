@@ -7,6 +7,9 @@
  * Due Date: Oct. 6, 2024
  */
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -28,7 +31,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class Rps101Downloader {
 
-
+    private final static String FILE_NAME = "allOutcomes.csv";
 
     /**
      * The main class is specifically done for function calling.
@@ -40,45 +43,46 @@ public class Rps101Downloader {
     }
 
     /**
-     * Runs the program.
+     * Runs the program and function calls.
      */
     public void run() {
-        getAllObjects();
+        System.out.print("Getting all objects... ");
+        List<String> allObjects = getAllObjects();
+        System.out.print(" done.");
+        //System.out.println("\n" + objects);
 
+        ObjectWins allObjectWins = null;
+        System.out.print("\nGetting all outcomes... ");
+        for (String objects : allObjects) {
+            allObjectWins = getAllOutcomes(objects);
+        }
+        System.out.print(" done.");
+
+        System.out.print("\nWriting all outcomes to " + "'" + FILE_NAME + "'");
+        writeToCsv(FILE_NAME, allObjects, allObjectWins);
+        System.out.print(" done.");
     }
+
 
 
 
 
     /**
      * Reads all objects from the Web API.
+     * @return ArrayList of all objects in RPS101
      */
-    public void getAllObjects() {
+    public List<String> getAllObjects() {
         final String allObjectsUrl = "https://rps101.pythonanywhere.com/api/v1/objects/all";
-        System.out.print("Getting all objects... ");
         List<String> allObjects = null;
         try (Reader reader = new InputStreamReader(new URI(allObjectsUrl).toURL().openStream()))
         {
             Gson gson = new Gson();
             Type listType = TypeToken.getParameterized(List.class, String.class).getType();
             allObjects = gson.fromJson(reader, listType);
-            System.out.print(" done.");
 
-            //allObjects.forEach(System.out::println);
-
-            if (allObjects != null && !allObjects.isEmpty()) {
-                System.out.print("\nGetting all outcomes... ");
-                for (String objectName : allObjects) {
-                    getAllOutcomes(objectName);
-                }
-                System.out.print(" done.");
-            }
-            else {
-                System.out.println("STOPPED -- Error: There are no objects to be read.");
-                System.exit(-1);
-            }
-
-
+            /* Prints all objects
+             * allObjects.forEach(System.out::println);
+            */
         } catch (IOException ex) {
             System.out.println(" -- Unable to read Web API.");
             System.exit(-1);
@@ -87,13 +91,21 @@ public class Rps101Downloader {
             System.exit(-1);
         }
 
+        if (allObjects == null) {
+            System.out.print(" -- Objects is empty.");
+            return null;
+        }
+        return allObjects;
+
     }
 
     /**
      *
      * Reads all outcomes of one object from the Web API.
+     * @param objectName name of one object in RPS101
+     * @return ArrayList of arrays of winning outcomes of the given object
      */
-    public void getAllOutcomes(String objectName) {
+    public Rps101Downloader.ObjectWins getAllOutcomes(String objectName) {
         final String objectUrl = String.format(
             "https://rps101.pythonanywhere.com/api/v1/objects/%s",
             objectName.replace(" ", "%20"));
@@ -102,9 +114,7 @@ public class Rps101Downloader {
             Gson gson = new Gson();
             wins = gson.fromJson(reader, ObjectWins.class);
 
-
-            /* Prints out the outer array of all outcomes.
-             *
+            /* Prints list of wins
             if (wins != null && wins.winningOutcomes != null) {
                 System.out.println("\nWinning outcomes for " + objectName + ":");
                 for (List<String> outcomeList : wins.winningOutcomes) {
@@ -120,6 +130,29 @@ public class Rps101Downloader {
             System.out.println(" -- Unable to parse URL.");
             System.exit(-1);
         }
+        return wins;
+    }
+
+    /**
+     * Writes to a .csv file.
+     * @param fileName file name that is written to.
+     */
+    public void writeToCsv(String fileName, List<String> allObjects, ObjectWins allOutcomes) {
+        File file = new File(fileName);
+
+        try {
+            FileWriter outputFile = new FileWriter(file);
+            BufferedWriter writer = new BufferedWriter(outputFile);
+
+
+
+
+
+
+        } catch (IOException ex) {
+            System.out.println(" -- Unable to write to file.");
+        }
+
     }
 
     private static class ObjectWins {
