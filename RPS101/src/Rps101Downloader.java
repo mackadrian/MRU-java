@@ -146,7 +146,6 @@ public class Rps101Downloader {
     public void writeToCsv(String fileName, List<String> allObjects, List<List<String>> allOutcomes) {
         File file = new File(fileName);
 
-
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             // Writes the top row with all 50 objects.
             writer.write("," + String.join(",", allObjects));
@@ -156,27 +155,39 @@ public class Rps101Downloader {
             // Iterate over each object for the rows
             for (int i = 0; i < allObjects.size(); i++) {
                 String objectName = allObjects.get(i);
-                StringBuilder row = new StringBuilder(objectName); // Start the row with the object name
+                StringBuilder row = new StringBuilder(objectName);
 
-                // Check outcomes against each object
+                List<String> verbs = getVerbOutcomes(allOutcomes);
                 for (int j = 0; j < allObjects.size(); j++) {
-                    // Avoid self-comparison, keep it blank
-                    if (i == j) {
-                        row.append(","); // Blank for self-comparison
+                    if (objectName == verbs.get(j)) {
+                        row.append(",");
                     }
-                }
-                // Write the complete row to the CSV
-                writer.write(row.toString());
-                writer.newLine(); // Move to the next line after each outcome
-            }
 
-            // Close the writer
+                }
+                writer.write(row.toString());
+                writer.newLine();
+
+            }
+            // Write the complete row to the CSV
             writer.close();
+
         } catch (IOException ex) {
             System.out.println(" EXITING PROGRAM -- Unable to write to file.");
             System.exit(-1);
         }
 
+    }
+
+    private static List<String> getVerbOutcomes (List<List<String>> allOutcomes) {
+        List<String> verbs = new ArrayList<String>();
+
+        for (List<String> eachOutcome : allOutcomes) {
+            for (String description : eachOutcome) {
+                verbs.add(description);
+            }
+        }
+
+        return verbs;
     }
 
 
