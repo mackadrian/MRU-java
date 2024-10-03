@@ -16,6 +16,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -32,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 public class Rps101Downloader {
 
     private final static String FILE_NAME = "allOutcomes.csv";
+    private final static String ALL_OBJECTS_URL = "https://rps101.pythonanywhere.com/api/v1/objects/all";
 
     /**
      * The main class is specifically done for function calling.
@@ -51,16 +53,20 @@ public class Rps101Downloader {
         System.out.print(" done.");
         //System.out.println("\n" + objects);
 
-        ObjectWins allObjectWins = null;
+        List<List<String>> allWinningOutcomes = new ArrayList<>();
+        ObjectWins wins = new ObjectWins();
         System.out.print("\nGetting all outcomes... ");
-        for (String objects : allObjects) {
-            allObjectWins = getAllOutcomes(objects);
+        for (String objectName : allObjects) {
+            wins = getObjectOutcomes(objectName);
+            allWinningOutcomes.addAll(wins.winningOutcomes); // Collect the outcomes
         }
         System.out.print(" done.");
 
-        System.out.print("\nWriting all outcomes to " + "'" + FILE_NAME + "'");
-        writeToCsv(FILE_NAME, allObjects, allObjectWins);
+
+        System.out.print("\nWriting all outcomes to '" + FILE_NAME + "'...");
+        writeToCsv(FILE_NAME, allObjects, allWinningOutcomes);
         System.out.print(" done.");
+
     }
 
 
@@ -72,9 +78,8 @@ public class Rps101Downloader {
      * @return ArrayList of all objects in RPS101
      */
     public List<String> getAllObjects() {
-        final String allObjectsUrl = "https://rps101.pythonanywhere.com/api/v1/objects/all";
         List<String> allObjects = null;
-        try (Reader reader = new InputStreamReader(new URI(allObjectsUrl).toURL().openStream()))
+        try (Reader reader = new InputStreamReader(new URI(ALL_OBJECTS_URL).toURL().openStream()))
         {
             Gson gson = new Gson();
             Type listType = TypeToken.getParameterized(List.class, String.class).getType();
@@ -84,16 +89,16 @@ public class Rps101Downloader {
              * allObjects.forEach(System.out::println);
             */
         } catch (IOException ex) {
-            System.out.println(" -- Unable to read Web API.");
+            System.out.println(" EXITING PROGRAM -- Unable to read Web API.");
             System.exit(-1);
         } catch (URISyntaxException ex) {
-            System.out.println(" -- Unable to parse URL.");
+            System.out.println(" EXITING PROGRAM -- Unable to parse URL.");
             System.exit(-1);
         }
 
         if (allObjects == null) {
-            System.out.print(" -- Objects is empty.");
-            return null;
+            System.out.print(" EXITING PROGRAM -- Objects is empty.");
+            System.exit(-1);
         }
         return allObjects;
 
@@ -103,9 +108,9 @@ public class Rps101Downloader {
      *
      * Reads all outcomes of one object from the Web API.
      * @param objectName name of one object in RPS101
-     * @return ArrayList of arrays of winning outcomes of the given object
+     * @return all of the winning outcomes for the given object
      */
-    public Rps101Downloader.ObjectWins getAllOutcomes(String objectName) {
+    public ObjectWins getObjectOutcomes(String objectName) {
         final String objectUrl = String.format(
             "https://rps101.pythonanywhere.com/api/v1/objects/%s",
             objectName.replace(" ", "%20"));
@@ -114,7 +119,7 @@ public class Rps101Downloader {
             Gson gson = new Gson();
             wins = gson.fromJson(reader, ObjectWins.class);
 
-            /* Prints list of wins
+            /* Prints all of winning outcomes for each object.
             if (wins != null && wins.winningOutcomes != null) {
                 System.out.println("\nWinning outcomes for " + objectName + ":");
                 for (List<String> outcomeList : wins.winningOutcomes) {
@@ -123,11 +128,12 @@ public class Rps101Downloader {
             }
             */
 
+
         } catch (IOException ex) {
-            System.out.println(" -- Unable to read Web API.");
+            System.out.println(" EXITING PROGRAM -- Unable to read Web API.");
             System.exit(-1);
         } catch (URISyntaxException ex) {
-            System.out.println(" -- Unable to parse URL.");
+            System.out.println(" EXITING PROGRAM -- Unable to parse URL.");
             System.exit(-1);
         }
         return wins;
@@ -137,23 +143,43 @@ public class Rps101Downloader {
      * Writes to a .csv file.
      * @param fileName file name that is written to.
      */
-    public void writeToCsv(String fileName, List<String> allObjects, ObjectWins allOutcomes) {
+    public void writeToCsv(String fileName, List<String> allObjects, List<List<String>> allOutcomes) {
         File file = new File(fileName);
 
-        try {
-            FileWriter outputFile = new FileWriter(file);
-            BufferedWriter writer = new BufferedWriter(outputFile);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            // Writes the top row with all 50 objects.
+            writer.write("," + String.join(",", allObjects));
+            writer.newLine();
 
 
+            // Iterate over each object for the rows
+            for (int i = 0; i < allObjects.size(); i++) {
+                String objectName = allObjects.get(i);
+                StringBuilder row = new StringBuilder(objectName); // Start the row with the object name
 
+                // Check outcomes against each object
+                for (int j = 0; j < allObjects.size(); j++) {
+                    // Avoid self-comparison, keep it blank
+                    if (i == j) {
+                        row.append(","); // Blank for self-comparison
+                    }
+                }
+                // Write the complete row to the CSV
+                writer.write(row.toString());
+                writer.newLine(); // Move to the next line after each outcome
+            }
 
-
-
+            // Close the writer
+            writer.close();
         } catch (IOException ex) {
-            System.out.println(" -- Unable to write to file.");
+            System.out.println(" EXITING PROGRAM -- Unable to write to file.");
+            System.exit(-1);
         }
 
     }
+
+
 
     private static class ObjectWins {
         @SerializedName("winning outcomes")
