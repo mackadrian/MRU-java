@@ -10,8 +10,13 @@
 import java.util.NoSuchElementException;
 
 /**
- * The implementation of a queue that allows efficient lookups and removals.
- * Interface created by: Jason Heard
+ * Class Name: LookupQueueImplementation
+ * Purpose: The implementation of Jason Heard's efficient queue interface.
+ *          Uses a doubly-linked list and hashtable to create an efficient way to look up
+ *          queues.
+ *
+ * Interface Name: LookupQueue
+ * Author: Jason Heard
  *
  * @author Mack Bautista
  */
@@ -152,9 +157,9 @@ public class LookupQueueImplementation implements LookupQueue {
 
     /**
      * Looks up the name to see if it is already inside the hashtable.
-     * @param name check to see if name is in hash table already.
+     * @param name check to see if name is in hash table already
      * @return false if name is not in the bucket yet
-     *         true if name is in the bucket.
+     *         true if name is in the bucket
      */
     private boolean lookupInHashtable(String name) {
         int index = getIndex(name);
@@ -186,7 +191,7 @@ public class LookupQueueImplementation implements LookupQueue {
 
     /**
      * Removes the name from the hashtable and rehashes it after removal.
-     * @param name to be removed from the hash table.
+     * @param name to be removed from the hash table
      */
     private void removeFromHashtable(String name) {
         int index = getIndex(name);
@@ -201,7 +206,10 @@ public class LookupQueueImplementation implements LookupQueue {
         }
     }
 
-
+    /**
+     * Rehashes the hashtable from the start of the removed given name.
+     * @param start starting index of the name
+     */
     private void rehashAfterRemoval(int start) {
         int index = (start + 1) % capacity;
         while (hashtable[index] != null) {
@@ -214,12 +222,15 @@ public class LookupQueueImplementation implements LookupQueue {
     }
 
 
+    /**
+     * Rehashes the hash table if the capacity is greater than the load factor.
+     */
     private void resizeHashtable() {
         int oldCapacity = capacity;
         capacity = getNextPrime(oldCapacity * 2);
         Node[] oldHashtable = hashtable;
         hashtable = new Node[capacity];
-        filled = 0; // Reset filled count
+        filled = 0;
 
         for (int i = 0; i < oldCapacity; i++) {
             if (oldHashtable[i] != null) {
@@ -229,11 +240,21 @@ public class LookupQueueImplementation implements LookupQueue {
     }
 
 
+    /**
+     * Passes the name inside the hash table to return the hash index of name.
+     * @param name contained inside the hash table
+     * @return hash index of the given name
+     */
     private int getIndex(String name) {
         return Math.abs(name.hashCode()) % capacity;
     }
 
 
+    /**
+     * Returns the next prime number of capacity in ascending order.
+     * @param number current prime number
+     * @return next current prime number
+     */
     private int getNextPrime(int number) {
         while (true) {
             if (isPrime(number)) {
@@ -244,6 +265,11 @@ public class LookupQueueImplementation implements LookupQueue {
     }
 
 
+    /**
+     * Checks to see if the previous capacity of the hash table is prime.
+     * @param num previous capacity of hash table
+     * @return next capacity of hash table
+     */
     private boolean isPrime(int num) {
         if (num <= 1) {
             return false;
