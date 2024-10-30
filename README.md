@@ -1,2 +1,1 @@
-A collection of Java projects that have been successfully implemented.
-Started on: Winter 2024
+A collection of Java assignments that have been successfully implemented.
