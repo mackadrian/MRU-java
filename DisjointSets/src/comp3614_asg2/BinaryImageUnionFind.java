@@ -19,120 +19,116 @@ import java.util.*;
  * 
  * Implementation for Assignment 2 Q4
  * 
- * Purpose: This class reads a binary image from a text file (face.txt) 
- * consisting of '+' and ' ' characters, and finds the connected components 
- * using the Union-Find (Disjoint-Set) data structure. 
- * 
- * The program outputs:
- * 1. The input binary image (requirement a)
- * 2. The connected component image, where each component is labeled 
- *    with a unique letter, and the representative of each component 
- *    is labeled with a number (requirement b)
- * 3. A list of component sizes sorted in descending order (requirement c)
- * 
- * Implementation Details:
- * - The image is read line by line into a single string.
- * - Each symbol is placed into a singleton set in the Union-Find data structure.
- * - Orthogonally adjacent '+' symbols are unioned into the same set.
- * - After all unions, finalSet() is called to fix representatives.
- * - Each component is assigned a unique letter, and representatives are assigned numbers.
- * - Component sizes are counted and sorted.
- * 
- * Usage:
- * Place face.txt in the same directory as the compiled program and run:
- *     java BinaryImageUnionFind
+ * Purpose: This class processes a binary (text-based) image to identify and label 
+ * connected components using a Union-Find (Disjoint-Set) structure. Each non-space 
+ * character in the image is treated as a pixel, and adjacent identical characters 
+ * are merged into the same set through union operations. The class then outputs 
+ * the labeled connected components along with their corresponding sizes, sorted 
+ * in descending order.
  * 
  * @author Mack Bautista
  */
 
 public class BinaryImageUnionFind {
-
+	
     private static final int ROWS = 71;
     private static final int COLS = 71;
 
-
-
     public void run(String filename) {
+        TreeNode[][] nodes = new TreeNode[ROWS][COLS];
         StringBuilder imageBuilder = new StringBuilder();
 
-        // Read input image
+        // Step 1: Read input image and create TreeNodes
         try (Scanner sc = new Scanner(new File(filename))) {
-        	while (sc.hasNextLine()) {
-        	    String line = sc.nextLine();
-        	    while (line.length() < COLS) {
-        	        line += " ";
-        	    }
-        	    imageBuilder.append(line);
-        	}
-
+            for (int r = 0; r < ROWS && sc.hasNextLine(); r++) {
+                String line = sc.nextLine();
+                while (line.length() < COLS) line += " ";
+                for (int c = 0; c < COLS; c++) {
+                    char ch = line.charAt(c);
+                    imageBuilder.append(ch);
+                    nodes[r][c] = new TreeNode(String.valueOf(ch), r * COLS + c);
+                }
+            }
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + filename);
             return;
         }
 
         String image = imageBuilder.toString();
-        int totalSymbols = image.length();
 
-        // Print initial image
+        // Step 2: Print initial image
         System.out.println("Initial Binary Image:");
         for (int r = 0; r < ROWS; r++) {
             System.out.println(image.substring(r * COLS, (r + 1) * COLS));
         }
 
-        // Initialize UnionFind
+        int totalSymbols = ROWS * COLS;
         UnionFind uf = new UnionFind(totalSymbols);
 
-        // Union orthogonal '+' neighbors
+        // Step 3: Make all sets
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
-                int idx = r * COLS + c;
-                if (image.charAt(idx) == '+') {
-                    // Right neighbor
-                	if (c + 1 < COLS && image.charAt(r * COLS + (c + 1)) == '+')
-                	    uf.unionSet(idx, r * COLS + (c + 1));
+                uf.makeSet(nodes[r][c]);
+            }
+        }
 
-                	// Down neighbor
-                	if (r + 1 < ROWS && image.charAt((r + 1) * COLS + c) == '+')
-                	    uf.unionSet(idx, (r + 1) * COLS + c);
+        // Step 4: Union orthogonal '+' neighbors 
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                String current = nodes[r][c].getElement();
+                if (!current.equals(" ")) {  // foreground symbol (not blank)
+                    // Right neighbor
+                    if (c + 1 < COLS && nodes[r][c + 1].getElement().equals(current)) {
+                        uf.unionSet(nodes[r][c].getIndex(), nodes[r][c + 1].getIndex());
+                    }
+                    // Down neighbor
+                    if (r + 1 < ROWS && nodes[r + 1][c].getElement().equals(current)) {
+                        uf.unionSet(nodes[r][c].getIndex(), nodes[r + 1][c].getIndex());
+                    }
                 }
             }
         }
 
-        // Ensure path compression
-        for (int i = 0; i < totalSymbols; i++) uf.findSet(i);
+        // Step 5: Finalize sets
+        uf.finalSet();
 
-        // Assign letters/numbers and build output image
+        // Step 6: Build output image with letters/numbers
         Map<Integer, Character> compLetters = new HashMap<>();
         Map<Integer, Integer> compNumbers = new HashMap<>();
         Map<Integer, Integer> compSizes = new HashMap<>();
         char currentLetter = 'a';
         int currentNumber = 1;
-        char[] output = new char[totalSymbols];
+
+        // Step 7: Using String[] instead of char[]
+        String[] output = new String[totalSymbols];
         Set<Integer> seenReps = new HashSet<>();
 
-        for (int i = 0; i < totalSymbols; i++) {
-            if (image.charAt(i) == ' ') {
-                output[i] = ' ';
-            } else {
-                int rep = uf.findSet(i);
-                compSizes.put(rep, compSizes.getOrDefault(rep, 0) + 1);
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                TreeNode node = nodes[r][c];
+                int idx = node.getIndex();
 
-                if (!compLetters.containsKey(rep)) {
-                    compLetters.put(rep, currentLetter++);
-                    compNumbers.put(rep, currentNumber++);
-                }
-
-                // First occurrence of representative gets number
-                if (!seenReps.contains(rep)) {
-                    output[i] = Character.forDigit(compNumbers.get(rep), 10);
-                    seenReps.add(rep);
+                if (node.getElement().equals(" ")) {
+                    output[idx] = " ";
                 } else {
-                    output[i] = compLetters.get(rep);
+                    int rep = uf.findSet(idx).getIndex();
+                    compSizes.put(rep, compSizes.getOrDefault(rep, 0) + 1);
+
+                    if (!compLetters.containsKey(rep)) {
+                        compLetters.put(rep, currentLetter++);
+                        compNumbers.put(rep, currentNumber++);
+                    }
+
+                    if (!seenReps.contains(rep)) {
+                        output[idx] = String.valueOf(compNumbers.get(rep));
+                        seenReps.add(rep);
+                    } else {
+                        output[idx] = String.valueOf(compLetters.get(rep));
+                    }
                 }
             }
         }
-
-        // Print connected component image
+        // Step 8: Print connected component image
         System.out.println("\nConnected Component Image:");
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
@@ -141,7 +137,7 @@ public class BinaryImageUnionFind {
             System.out.println();
         }
 
-        // Print component sizes sorted descending
+        // Step 9: Print sorted component sizes
         List<Map.Entry<Integer, Integer>> compList = new ArrayList<>(compSizes.entrySet());
         compList.sort((a, b) -> b.getValue() - a.getValue());
 
@@ -155,6 +151,3 @@ public class BinaryImageUnionFind {
         }
     }
 }
-
-
-

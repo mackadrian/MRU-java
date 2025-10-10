@@ -10,10 +10,14 @@
 
 package comp3614_asg2;
 
+
 public class MainProgram {
+	
+	private static final String INPUT_FILE = "face.txt";
+	
     public static void main(String[] args) {
         BinaryImageUnionFind cc = new BinaryImageUnionFind();
-        cc.run("face.txt"); // make sure face.txt is in the project root
+        cc.run(INPUT_FILE); 
     }
 }
 
